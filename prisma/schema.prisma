@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+
+// Save tokens after OAuth callback
+await prisma.drChronoAuth.create({
+  data: {
+    userId: user.id,
+    accessToken: tokens.access_token,
+    refreshToken: tokens.refresh_token,
+    expiresAt: new Date(Date.now() + tokens.expires_in * 1000),
+  },
+});
+
+// Get tokens before making API request
+const auth = await prisma.drChronoAuth.findFirst({
+  where: { userId: user.id },
+});
+
