@@ -1,0 +1,10 @@
+import React from 'react'
+
+type Props = {}
+
+export default function Patients(props: Props) {
+  return (
+    <div>Appointments page</div>
+  )
+}
+
