@@ -2,7 +2,7 @@ import axios from "axios";
 import PatientCard from "./PatientCard";
 
 import { useState } from "react";
-import PatientModal from "./PatientModal";
+import PatientModal from "./ViewPatientDetails";
 
 const updatingData = [
   { name: "first_name", placeholder: "Enter the first name" },
