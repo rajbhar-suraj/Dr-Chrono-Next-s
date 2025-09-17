@@ -1,6 +1,5 @@
 import axios from "axios";
 import PatientCard from "./PatientCard";
-
 import { useState } from "react";
 import PatientModal from "./ViewPatientDetails";
 
@@ -21,6 +20,14 @@ export function ViewPatients({ patients, setPatients }: Props) {
   const [details, setDetails] = useState<any>({});
   const [editing, setEditing] = useState(false);
   const [updateData, setUpdateData] = useState<any>({});
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const pageSize = 9; // 3 columns x 3 rows per page
+  const totalPages = Math.ceil(patients.length / pageSize);
+  const paginatedPatients = patients.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const startEditing = () => {
     setUpdateData(details);
@@ -51,50 +58,79 @@ export function ViewPatients({ patients, setPatients }: Props) {
   };
 
   return (
-   <div className="flex gap-6 p-6">
-  
-  <div className="flex-1 bg-gray-100 rounded-2xl h-[calc(100vh-64px)] overflow-y-auto">
-    <div className="p-7">
-      <h2 className="text-gray-700 text-xl pb-1">Patients</h2>
-      
-      {!viewDetails && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {patients.map((pat) => (
-            <PatientCard
-              key={pat.id}
-              patient={pat}
-              onView={(data) => {
-                setViewDetails(true);
-                setDetails(data);
-              }}
-              onDelete={handleDelete}
+    <div className="flex gap-6 p-6">
+      <div className="flex-1 bg-gray-100 rounded-2xl h-[calc(100vh-64px)] overflow-y-auto">
+        <div className="p-7">
+          <h2 className="text-gray-700 text-xl pb-1">
+            Patients ({patients.length})
+          </h2>
+
+          {!viewDetails && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {paginatedPatients.map((pat) => (
+                  <PatientCard
+                    key={pat.id}
+                    patient={pat}
+                    onView={(data) => {
+                      setViewDetails(true);
+                      setDetails(data);
+                    }}
+                    onDelete={handleDelete}
+                    setEditing={setEditing}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex gap-3 justify-center mt-6">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+                  <span className="font-medium">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(p + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {viewDetails && (
+            <PatientModal
+              updatingData={updatingData}
+              isOpen={viewDetails}
+              details={details}
+              editing={editing}
+              updateData={updateData}
+              changeHandler={changeHandler}
+              startEditing={startEditing}
               setEditing={setEditing}
+              setUpdateData={setUpdateData}
+              handleUpdate={handleUpdate}
+              onClose={() => {
+                setViewDetails(false);
+                setEditing(false);
+              }}
             />
-          ))}
+          )}
         </div>
-      )}
-
-      {viewDetails && (
-        <PatientModal
-          updatingData={updatingData}
-          isOpen={viewDetails}
-          details={details}
-          editing={editing}
-          updateData={updateData}
-          changeHandler={changeHandler}
-          startEditing={startEditing}
-          setEditing={setEditing}
-          setUpdateData={setUpdateData}
-          handleUpdate={handleUpdate}
-          onClose={() => {
-            setViewDetails(false);
-            setEditing(false);
-          }}
-        />
-      )}
+      </div>
     </div>
-  </div>
-</div>
-
   );
 }
+
+export default ViewPatients;

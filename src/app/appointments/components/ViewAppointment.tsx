@@ -11,19 +11,22 @@ export function ViewAppointment({ appointments }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  // Filter appointments by date and status
+  // ✅ Filter appointments by date and status
   const filteredAppointments = appointments.filter((appt) => {
     const matchesDate = filterDate
       ? appt.start_date_time.startsWith(filterDate)
       : true;
     const matchesStatus = filterStatus
-      ? appt.appointment_status.toLowerCase().includes(filterStatus.toLowerCase())
+      ? appt.appointment_status
+          .toLowerCase()
+          .includes(filterStatus.toLowerCase())
       : true;
     return matchesDate && matchesStatus;
   });
 
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredAppointments.length / pageSize);
+  // ✅ Pagination calculations (based on filtered list)
+  const totalAppointments = filteredAppointments.length;
+  const totalPages = Math.ceil(totalAppointments / pageSize);
   const paginatedAppointments = filteredAppointments.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -31,7 +34,9 @@ export function ViewAppointment({ appointments }: Props) {
 
   return (
     <div className="p-6 flex flex-col items-center">
-      <h2 className="text-xl font-bold mb-6">Appointments</h2>
+      <h2 className="text-xl font-bold mb-6">
+        Appointments ({totalAppointments})
+      </h2>
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6 w-full max-w-3xl">
@@ -40,16 +45,15 @@ export function ViewAppointment({ appointments }: Props) {
           value={filterDate}
           onChange={(e) => {
             setFilterDate(e.target.value);
-            setCurrentPage(1); // Reset page on filter change
+            setCurrentPage(1); // reset page
           }}
           className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Filter by date"
         />
         <select
           value={filterStatus}
           onChange={(e) => {
             setFilterStatus(e.target.value);
-            setCurrentPage(1);
+            setCurrentPage(1); // reset page
           }}
           className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
@@ -57,6 +61,7 @@ export function ViewAppointment({ appointments }: Props) {
           <option value="confirmed">Confirmed</option>
           <option value="pending">Pending</option>
           <option value="cancelled">Cancelled</option>
+          <option value="scheduled">Scheduled</option>
         </select>
       </div>
 
@@ -89,7 +94,8 @@ export function ViewAppointment({ appointments }: Props) {
               )}
               {appt.associated_providers?.length > 0 && (
                 <p className="text-sm text-gray-600">
-                  Provider: {appt.associated_providers.map((p: any) => p.name).join(", ")}
+                  Provider:{" "}
+                  {appt.associated_providers.map((p: any) => p.name).join(", ")}
                 </p>
               )}
             </div>
@@ -102,8 +108,8 @@ export function ViewAppointment({ appointments }: Props) {
       </div>
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="flex gap-2 mt-6">
+      {totalPages >= 1 && (
+        <div className="flex gap-3 mt-6 items-center">
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             disabled={currentPage === 1}
@@ -111,7 +117,9 @@ export function ViewAppointment({ appointments }: Props) {
           >
             Prev
           </button>
-            <span>{currentPage}...{totalPages}</span>
+          <span className="font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
           <button
             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
             disabled={currentPage === totalPages}

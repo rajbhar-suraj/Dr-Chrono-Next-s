@@ -20,12 +20,6 @@ export default function Page() {
         const res = await axios.get("api/appointments")
         console.log(res.data.data)
         setAppointments(res.data.data)
-
-        // } else {
-        //   const res = await axios("/api/appointments");
-        //   setAppointments(res.data.data)
-        //   console.log(res.data.data)
-        // }
       } catch (err) {
         console.error(err);
       } finally {
@@ -39,7 +33,6 @@ export default function Page() {
   const actions = [
     { name: "View Appointments", key: "list" },
     { name: "Create Appointment", key: "create" },
-    { name: "Availability", key: "records" },
 
   ];
 
@@ -50,11 +43,11 @@ export default function Page() {
     // records: <PatientRecords patients={patients} setPatients={setPatients} />,
   };
 
-  if (loading) return;
+  if (loading) return <Loader />;
   return (
     <div className="flex gap-6 p-6">
       <Sidebar actions={actions} onSelect={setSelectedAction} />
-      <div className="flex-1 bg-gray-100 rounded-2xl h-[calc(100vh-64px)]">
+      <div className="flex-1 bg-gray-100 rounded-2xl ">
         {actionComponents[selectedAction]}
       </div>
     </div>
