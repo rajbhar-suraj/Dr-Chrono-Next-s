@@ -17,6 +17,7 @@ export default function Page() {
     async function fetchPatients() {
       try {
         const res = await axios("/api/patients");
+        console.log(res.data.data)
         setPatients(res.data.data);
       } catch (err) {
         console.error(err);
@@ -32,13 +33,14 @@ export default function Page() {
     { name: "View Patients", key: "list" },
     { name: "Create Patient", key: "create" },
     { name: "Patient Records", key: "records" },
+
   ];
 
   // Mapping key → component
   const actionComponents: Record<string, JSX.Element> = {
     list: <ViewPatients patients={patients} setPatients={setPatients} />,
     create: <CreatePatientForm patients={patients} setPatients={setPatients} />,
-    records: <PatientRecords />,
+    records: <PatientRecords patients={patients} setPatients={setPatients} />,
   };
 
   if (loading) return <Loader />;

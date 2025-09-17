@@ -53,7 +53,7 @@ export const PatientModal: React.FC<PatientModalProps> = ({ isOpen, onClose, det
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700">
                         {editing ? (
                             <div className="flex items-center gap-2">
-                                {updatingData.map((det) => (
+                                {updatingData && updatingData.map((det) => (
                                     <input
                                         key={det.name}
                                         className="border px-2 py-1 rounded-md w-40 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
